@@ -1,3 +1,10 @@
+use log::info;
+use simple_logger::SimpleLogger;
+
 fn main() {
-    println!("Hello, world!");
+    SimpleLogger::new()
+        .init()
+        .expect("Unable to initialize logger");
+
+    info!("Hello, world!");
 }
