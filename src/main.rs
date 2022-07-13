@@ -1,9 +1,11 @@
 mod cartridge;
+mod cpu;
 mod memory;
 
 use std::env;
 
 use cartridge::Cartridge;
+use cpu::Cpu;
 use log::error;
 use memory::Memory;
 use simple_logger::SimpleLogger;
@@ -13,21 +15,42 @@ fn main() {
         .init()
         .expect("Unable to initialize logger");
 
+    // Initialize the system
+    let mut cpu = Cpu::new();
     let mut memory = Memory::new();
-    let game_data = load_cartridge_from_cmdline_args();
 
-    memory.copy_into_memory_at_address(0u16, &game_data.data);
-}
+    let mut max_ticks = None;
 
-/// Load a ROM file using the first command-line argument as a path to the ROM file
-fn load_cartridge_from_cmdline_args() -> Cartridge {
+    // Respect command-line argument flags
     let args = env::args().collect::<Vec<String>>();
+    if args.len() > 1 {
+        // Load the specified ROM into memory
+        let game_data = Cartridge::new_from_file(&args[1]);
+        memory.copy_into_memory_at_address(0u16, &game_data.data);
 
-    // First command-line argumnet is always the executable itself, hence the length has to equal 2
-    if args.len() != 2 {
-        error!("Expected exactly 1 argument with a path to a rom file");
-        return Cartridge::new_empty();
+        // Optional argument: stop running after N ticks
+        if args.len() > 2 {
+            max_ticks = Some(
+                args[2]
+                    .parse::<u64>()
+                    .expect("Maximum number of ticks is not a valid u64"),
+            );
+        }
+    } else {
+        error!("Expected the follow flags: <ROM PATH> <MAX NUM TICKS>");
     }
 
-    Cartridge::new_from_file(&args[1])
+    // Start emulating
+    let mut ticks = 0u64;
+    loop {
+        // Debug feature: stop emulating once the specified number of ticks have been hit
+        if let Some(max_ticks) = max_ticks {
+            if ticks >= max_ticks {
+                break;
+            }
+        }
+
+        cpu.tick(&mut memory);
+        ticks += 1;
+    }
 }
