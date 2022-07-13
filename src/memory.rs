@@ -34,11 +34,21 @@ impl Memory {
         }
     }
 
-    /// Read a single byte at the specified address
+    /// Read a single byte from the specified address
     pub fn read_byte_at(&self, address: u16) -> u8 {
         self.bytes[usize::from(address)]
     }
 
+    /// Read a 16-bit value from the specified address and address + 1.
+    /// The GameBoy is little-endian, which means the least significant byte comes first!
+    pub fn read_16_bit_value_at(&self, address: u16) -> u16 {
+        let high = u16::from(self.read_byte_at(address));
+        let low = u16::from(self.read_byte_at(address + 1));
+
+        (low << 8) | high
+    }
+
+    /// Write a single byte to the specified address
     pub fn write_byte_at(&mut self, address: u16, value: &u8) {
         self.bytes[usize::from(address)] = *value;
     }

@@ -1,6 +1,7 @@
 mod cartridge;
 mod cpu;
 mod memory;
+mod opcodes;
 
 use std::env;
 

@@ -1,6 +1,9 @@
 use log::{error, info};
 
-use crate::memory::Memory;
+use crate::{
+    memory::Memory,
+    opcodes::{jp_a16, nop},
+};
 
 /// Represents the GameBoy's CPU (a Sharp CPU based on Intel's 8080 CPU)
 pub struct Cpu {
@@ -23,7 +26,7 @@ pub struct Cpu {
     program_counter: u16,
 
     /// Current cycle
-    cycle: u64,
+    current_cycle: u64,
 }
 
 impl Cpu {
@@ -38,7 +41,7 @@ impl Cpu {
             hl: 0,
             stack_pointer: 0,
             program_counter: 0x0100,
-            cycle: 0,
+            current_cycle: 0,
         }
     }
 
@@ -47,22 +50,42 @@ impl Cpu {
         self.process_opcode(memory);
     }
 
+    /// Move the program counter by adding an offset to the current position
+    pub fn move_program_counter_by(&mut self, delta: u16) {
+        self.program_counter += delta;
+    }
+
+    /// Set the program counter to the specified address
+    pub fn set_program_counter(&mut self, address: u16) {
+        self.program_counter = address;
+    }
+
+    /// Get the current value of the program counter
+    pub fn get_program_counter(&self) -> u16 {
+        self.program_counter
+    }
+
+    /// Update the internal cycle tracker of the CPU
+    pub fn add_cycles(&mut self, cycles: u64) {
+        self.current_cycle += cycles;
+    }
+
+    /// Process the current opcode
     fn process_opcode(&mut self, memory: &mut Memory) {
         let opcode = self.read_opcode(memory);
 
         match opcode {
-            _ => error!("Unknown opcode: {:#06x}", opcode),
+            0x00 => nop(self),
+            0xC3 => jp_a16(self, memory),
+            _ => error!(
+                "Unknown opcode \"{:#03x}\" at address \"{:#06x}\"",
+                opcode, self.program_counter
+            ),
         };
     }
 
-    fn read_opcode(&mut self, memory: &mut Memory) -> u8 {
-        let opcode = memory.read_byte_at(self.program_counter);
-        info!(
-            "PC: {:#06x} --> opcode {:#06x}]",
-            self.program_counter, opcode
-        );
-
-        self.program_counter += 1;
-        opcode
+    /// Read an opcode from the location in memory to which the program counter points
+    fn read_opcode(&self, memory: &mut Memory) -> u8 {
+        memory.read_byte_at(self.program_counter)
     }
 }
