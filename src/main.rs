@@ -1,9 +1,11 @@
 mod cartridge;
+mod memory;
 
 use std::env;
 
 use cartridge::Cartridge;
 use log::error;
+use memory::Memory;
 use simple_logger::SimpleLogger;
 
 fn main() {
@@ -11,7 +13,10 @@ fn main() {
         .init()
         .expect("Unable to initialize logger");
 
+    let mut memory = Memory::new();
     let game_data = load_cartridge_from_cmdline_args();
+
+    memory.copy_into_memory_at_address(0u16, &game_data.data);
 }
 
 /// Load a ROM file using the first command-line argument as a path to the ROM file
