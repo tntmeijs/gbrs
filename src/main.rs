@@ -1,3 +1,4 @@
+mod bits;
 mod cartridge;
 mod cpu;
 mod memory;
