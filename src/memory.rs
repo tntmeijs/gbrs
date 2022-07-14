@@ -1,5 +1,10 @@
 use log::error;
 
+use crate::{
+    bits::{lsb_msb_to_u16, u16_to_lsb_msb},
+    cpu::Cpu,
+};
+
 /// Represents a GameBoy's addressable memory - this includes ROM, RAM, VRAM, etc.
 pub struct Memory {
     pub bytes: Vec<u8>,
@@ -29,7 +34,7 @@ impl Memory {
                 let write_address = index + usize::from(address);
 
                 // Write address will always fit in a u16 as its bounds were checked already
-                self.write_byte_at(write_address as u16, byte);
+                self.write_byte_at(write_address as u16, *byte);
             }
         }
     }
@@ -42,14 +47,48 @@ impl Memory {
     /// Read a 16-bit value from the specified address and address + 1.
     /// The GameBoy is little-endian, which means the least significant byte comes first!
     pub fn read_16_bit_value_at(&self, address: u16) -> u16 {
-        let high = u16::from(self.read_byte_at(address));
-        let low = u16::from(self.read_byte_at(address + 1));
+        let lsb = self.read_byte_at(address);
+        let msb = self.read_byte_at(address + 1);
 
-        (low << 8) | high
+        lsb_msb_to_u16(lsb, msb)
     }
 
     /// Write a single byte to the specified address
-    pub fn write_byte_at(&mut self, address: u16, value: &u8) {
-        self.bytes[usize::from(address)] = *value;
+    pub fn write_byte_at(&mut self, address: u16, value: u8) {
+        self.bytes[usize::from(address)] = value;
+    }
+
+    /// Write a 16-bit value to the specified address and address + 1.
+    /// The GameBoy is little-endian, which means the least significant byte comes first!
+    pub fn write_16_bit_value_at(&mut self, address: u16, value: u16) {
+        let (lsb, msb) = u16_to_lsb_msb(value);
+
+        self.bytes[usize::from(address)] = lsb;
+        self.bytes[usize::from(address + 1)] = msb;
+    }
+
+    /// Push a new 16-bit value onto the stack
+    pub fn push_stack_u16(&mut self, value: u16, cpu: &mut Cpu) {
+        let (lsb, msb) = u16_to_lsb_msb(value);
+
+        // MSB has to be stored first because the stack grows "downwards" / "backwards"
+        cpu.stack_pointer -= 1;
+        self.bytes[usize::from(cpu.stack_pointer)] = msb;
+
+        // LSB has to be stored last because the stack grows "downwards" / "backwards"
+        cpu.stack_pointer -= 1;
+        self.bytes[usize::from(cpu.stack_pointer)] = lsb;
+    }
+
+    /// Pop an existing u16 value from the stack
+    pub fn pop_stack_u16(&mut self, cpu: &mut Cpu) -> u16 {
+        // Pop in reverse order because the stack grows "downwards" (see push_stack_u16)
+        let lsb = self.bytes[usize::from(cpu.stack_pointer)];
+        cpu.stack_pointer += 1;
+
+        let msb = self.bytes[usize::from(cpu.stack_pointer)];
+        cpu.stack_pointer += 1;
+
+        lsb_msb_to_u16(lsb, msb)
     }
 }
