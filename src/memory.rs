@@ -67,27 +67,35 @@ impl Memory {
         self.bytes[usize::from(address + 1)] = msb;
     }
 
+    /// Push a new 8-bit value onto the stack
+    pub fn push_stack_u8(&mut self, value: u8, cpu: &mut Cpu) {
+        cpu.stack_pointer -= 1;
+        self.bytes[usize::from(cpu.stack_pointer)] = value;
+    }
+
+    /// Pop an existing 8-bit value from the stack
+    pub fn pop_stack_u8(&mut self, cpu: &mut Cpu) -> u8 {
+        let value = self.bytes[usize::from(cpu.stack_pointer)];
+        cpu.stack_pointer += 1;
+        value
+    }
+
     /// Push a new 16-bit value onto the stack
     pub fn push_stack_u16(&mut self, value: u16, cpu: &mut Cpu) {
         let (lsb, msb) = u16_to_lsb_msb(value);
 
         // MSB has to be stored first because the stack grows "downwards" / "backwards"
-        cpu.stack_pointer -= 1;
-        self.bytes[usize::from(cpu.stack_pointer)] = msb;
+        self.push_stack_u8(msb, cpu);
 
         // LSB has to be stored last because the stack grows "downwards" / "backwards"
-        cpu.stack_pointer -= 1;
-        self.bytes[usize::from(cpu.stack_pointer)] = lsb;
+        self.push_stack_u8(lsb, cpu);
     }
 
     /// Pop an existing u16 value from the stack
     pub fn pop_stack_u16(&mut self, cpu: &mut Cpu) -> u16 {
         // Pop in reverse order because the stack grows "downwards" (see push_stack_u16)
-        let lsb = self.bytes[usize::from(cpu.stack_pointer)];
-        cpu.stack_pointer += 1;
-
-        let msb = self.bytes[usize::from(cpu.stack_pointer)];
-        cpu.stack_pointer += 1;
+        let lsb = self.pop_stack_u8(cpu);
+        let msb = self.pop_stack_u8(cpu);
 
         lsb_msb_to_u16(lsb, msb)
     }
