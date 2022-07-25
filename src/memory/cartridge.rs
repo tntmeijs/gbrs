@@ -27,3 +27,10 @@ impl Cartridge {
         }
     }
 }
+
+impl Default for Cartridge {
+    /// Create a new Cartridge instance with default values
+    fn default() -> Self {
+        Self::new_empty()
+    }
+}

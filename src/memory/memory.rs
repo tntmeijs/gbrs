@@ -100,3 +100,10 @@ impl Memory {
         lsb_msb_to_u16(lsb, msb)
     }
 }
+
+impl Default for Memory {
+    /// Create a new Memory instance with default values
+    fn default() -> Self {
+        Self::new()
+    }
+}

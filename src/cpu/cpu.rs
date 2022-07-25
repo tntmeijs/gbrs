@@ -558,3 +558,10 @@ impl Cpu {
         memory.read_byte_at(self.program_counter)
     }
 }
+
+impl Default for Cpu {
+    /// Create a new Cpu instance with default values
+    fn default() -> Self {
+        Self::new()
+    }
+}
