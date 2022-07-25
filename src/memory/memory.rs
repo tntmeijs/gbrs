@@ -1,8 +1,8 @@
 use log::error;
 
 use crate::{
-    bits::{lsb_msb_to_u16, u16_to_lsb_msb},
-    cpu::Cpu,
+    cpu::cpu::Cpu,
+    utility::bits::{lsb_msb_to_u16, u16_to_lsb_msb},
 };
 
 /// Represents a GameBoy's addressable memory - this includes ROM, RAM, VRAM, etc.

@@ -1,15 +1,12 @@
-mod bits;
-mod cartridge;
 mod cpu;
 mod memory;
-mod opcodes;
+mod utility;
 
 use std::env;
 
-use cartridge::Cartridge;
-use cpu::Cpu;
+use cpu::cpu::Cpu;
 use log::error;
-use memory::Memory;
+use memory::{cartridge::Cartridge, memory::Memory};
 use simple_logger::SimpleLogger;
 
 fn main() {

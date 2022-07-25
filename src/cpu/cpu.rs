@@ -1,31 +1,31 @@
 use log::error;
 
 use crate::{
-    bits::{is_nth_bit_set_u8, set_bit_n_state_u8},
-    memory::Memory,
-    opcodes::{
-        add_a_a, add_a_b, add_a_c, add_a_d, add_a_d8, add_a_e, add_a_h, add_a_hl, add_a_l,
-        add_hl_bc, add_hl_de, add_hl_hl, add_hl_sp, add_sp_s8, and_a, and_b, and_c, and_d, and_d8,
-        and_e, and_h, and_hl, and_l, call_a16, call_c_a16, call_nc_a16, call_nz_a16, call_z_a16,
-        ccf, cp_a, cp_b, cp_c, cp_d, cp_d8, cp_e, cp_h, cp_hl, cp_l, cpl, dec_a, dec_b, dec_bc,
-        dec_c, dec_d, dec_de, dec_e, dec_h, dec_hl, dec_hl_address, dec_l, dec_sp, di, ei, halt,
-        inc_a, inc_b, inc_bc, inc_c, inc_d, inc_de, inc_e, inc_h, inc_hl, inc_hl_address, inc_l,
-        inc_sp, jp_a16, jp_c_a16, jp_hl, jp_nc_a16, jp_nz_a16, jp_z_a16, jr_c_s8, jr_nc_s8,
-        jr_nz_s8, jr_s8, jr_z_s8, ld_a16_a, ld_a16_sp, ld_a8_a, ld_a_a, ld_a_a16, ld_a_a8, ld_a_b,
-        ld_a_bc, ld_a_c, ld_a_d, ld_a_d8, ld_a_de, ld_a_e, ld_a_h, ld_a_hl, ld_a_hl_dec,
-        ld_a_hl_inc, ld_a_l, ld_a_port_c, ld_b_a, ld_b_b, ld_b_c, ld_b_d, ld_b_d8, ld_b_e, ld_b_h,
-        ld_b_hl, ld_b_l, ld_bc_a, ld_bc_d16, ld_c_a, ld_c_b, ld_c_c, ld_c_d, ld_c_d8, ld_c_e,
-        ld_c_h, ld_c_hl, ld_c_l, ld_d_a, ld_d_b, ld_d_c, ld_d_d, ld_d_d8, ld_d_e, ld_d_h, ld_d_hl,
-        ld_d_l, ld_de_a, ld_de_d16, ld_e_a, ld_e_b, ld_e_c, ld_e_d, ld_e_d8, ld_e_e, ld_e_h,
-        ld_e_hl, ld_e_l, ld_h_a, ld_h_b, ld_h_c, ld_h_d, ld_h_d8, ld_h_e, ld_h_h, ld_h_hl, ld_h_l,
-        ld_hl_a, ld_hl_b, ld_hl_c, ld_hl_d, ld_hl_d16, ld_hl_d8, ld_hl_dec_a, ld_hl_e, ld_hl_h,
-        ld_hl_inc_a, ld_hl_l, ld_hl_sp_plus_s8, ld_l_a, ld_l_b, ld_l_c, ld_l_d, ld_l_d8, ld_l_e,
-        ld_l_h, ld_l_hl, ld_l_l, ld_port_c_a, ld_sp_d16, ld_sp_hl, nop, or_a, or_b, or_c, or_d,
-        or_d8, or_e, or_h, or_hl, or_l, pop_af, pop_bc, pop_de, pop_hl, push_af, push_bc, push_de,
-        push_hl, ret, ret_c, ret_nc, ret_nz, ret_z, reti, rla, rlca, rra, rrca, scf, stop, sub_a,
-        sub_b, sub_c, sub_d, sub_d8, sub_e, sub_h, sub_hl, sub_l, xor_a, xor_b, xor_c, xor_d,
-        xor_d8, xor_e, xor_h, xor_hl, xor_l,
-    },
+    memory::memory::Memory,
+    utility::bits::{is_nth_bit_set_u8, set_bit_n_state_u8},
+};
+
+use super::opcodes::{
+    add_a_a, add_a_b, add_a_c, add_a_d, add_a_d8, add_a_e, add_a_h, add_a_hl, add_a_l, add_hl_bc,
+    add_hl_de, add_hl_hl, add_hl_sp, add_sp_s8, and_a, and_b, and_c, and_d, and_d8, and_e, and_h,
+    and_hl, and_l, call_a16, call_c_a16, call_nc_a16, call_nz_a16, call_z_a16, ccf, cp_a, cp_b,
+    cp_c, cp_d, cp_d8, cp_e, cp_h, cp_hl, cp_l, cpl, dec_a, dec_b, dec_bc, dec_c, dec_d, dec_de,
+    dec_e, dec_h, dec_hl, dec_hl_address, dec_l, dec_sp, di, ei, halt, inc_a, inc_b, inc_bc, inc_c,
+    inc_d, inc_de, inc_e, inc_h, inc_hl, inc_hl_address, inc_l, inc_sp, jp_a16, jp_c_a16, jp_hl,
+    jp_nc_a16, jp_nz_a16, jp_z_a16, jr_c_s8, jr_nc_s8, jr_nz_s8, jr_s8, jr_z_s8, ld_a16_a,
+    ld_a16_sp, ld_a8_a, ld_a_a, ld_a_a16, ld_a_a8, ld_a_b, ld_a_bc, ld_a_c, ld_a_d, ld_a_d8,
+    ld_a_de, ld_a_e, ld_a_h, ld_a_hl, ld_a_hl_dec, ld_a_hl_inc, ld_a_l, ld_a_port_c, ld_b_a,
+    ld_b_b, ld_b_c, ld_b_d, ld_b_d8, ld_b_e, ld_b_h, ld_b_hl, ld_b_l, ld_bc_a, ld_bc_d16, ld_c_a,
+    ld_c_b, ld_c_c, ld_c_d, ld_c_d8, ld_c_e, ld_c_h, ld_c_hl, ld_c_l, ld_d_a, ld_d_b, ld_d_c,
+    ld_d_d, ld_d_d8, ld_d_e, ld_d_h, ld_d_hl, ld_d_l, ld_de_a, ld_de_d16, ld_e_a, ld_e_b, ld_e_c,
+    ld_e_d, ld_e_d8, ld_e_e, ld_e_h, ld_e_hl, ld_e_l, ld_h_a, ld_h_b, ld_h_c, ld_h_d, ld_h_d8,
+    ld_h_e, ld_h_h, ld_h_hl, ld_h_l, ld_hl_a, ld_hl_b, ld_hl_c, ld_hl_d, ld_hl_d16, ld_hl_d8,
+    ld_hl_dec_a, ld_hl_e, ld_hl_h, ld_hl_inc_a, ld_hl_l, ld_hl_sp_plus_s8, ld_l_a, ld_l_b, ld_l_c,
+    ld_l_d, ld_l_d8, ld_l_e, ld_l_h, ld_l_hl, ld_l_l, ld_port_c_a, ld_sp_d16, ld_sp_hl, nop, or_a,
+    or_b, or_c, or_d, or_d8, or_e, or_h, or_hl, or_l, pop_af, pop_bc, pop_de, pop_hl, push_af,
+    push_bc, push_de, push_hl, ret, ret_c, ret_nc, ret_nz, ret_z, reti, rla, rlca, rra, rrca, scf,
+    stop, sub_a, sub_b, sub_c, sub_d, sub_d8, sub_e, sub_h, sub_hl, sub_l, xor_a, xor_b, xor_c,
+    xor_d, xor_d8, xor_e, xor_h, xor_hl, xor_l,
 };
 
 /// Represents all special states the CPU can be in

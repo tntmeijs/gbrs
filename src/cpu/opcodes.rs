@@ -1,10 +1,11 @@
 use crate::{
-    bits::{
+    memory::memory::Memory,
+    utility::bits::{
         is_nth_bit_set_u16, is_nth_bit_set_u8, lsb_msb_to_u16, set_bit_n_state_u8, u16_to_lsb_msb,
     },
-    cpu::{Cpu, CpuState, InterruptFlag},
-    memory::Memory,
 };
+
+use super::cpu::{Cpu, CpuState, InterruptFlag};
 
 /// Only advances the program counter by 1
 pub fn nop(cpu: &mut Cpu) {
