@@ -2,6 +2,7 @@
 name = "gbrs"
 version = "0.1.0"
 edition = "2021"
+homepage = "https://github.com/tntmeijs/gbrs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -12,3 +13,6 @@ simple_logger = { version = "2.2.0", default-features = false, features = [
 ] }
 egui = "0.18.1"
 eframe = "0.18.0"
+egui_extras = "0.18.0"
+rfd = "0.9.1"
+open = "3.0.2"

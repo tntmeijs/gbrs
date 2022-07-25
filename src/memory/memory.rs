@@ -20,7 +20,7 @@ impl Memory {
 
     /// Copy a block of bytes into memory starting at the specified address without allocating a
     /// a new vector (this method iterates over all bytes and copies each value)
-    pub fn copy_into_memory_at_address(&mut self, address: u16, data: &Vec<u8>) {
+    pub fn copy_into_memory_at_address(&mut self, address: u16, data: &Vec<u8>) -> bool {
         let last_byte_index = usize::from(address) + data.len();
 
         if last_byte_index > self.bytes.len() {
@@ -29,14 +29,21 @@ impl Memory {
                 last_byte_index,
                 self.bytes.len()
             );
-        } else {
-            for (index, byte) in data.iter().enumerate() {
-                let write_address = index + usize::from(address);
 
-                // Write address will always fit in a u16 as its bounds were checked already
-                self.write_byte_at(write_address as u16, *byte);
-            }
+            // Failure!
+            return false;
         }
+
+        // Copy each byte into memory
+        for (index, byte) in data.iter().enumerate() {
+            let write_address = index + usize::from(address);
+
+            // Write address will always fit in a u16 as its bounds were checked already
+            self.write_byte_at(write_address as u16, *byte);
+        }
+
+        // Success
+        true
     }
 
     /// Read a single byte from the specified address

@@ -13,7 +13,6 @@ fn main() {
         .expect("Unable to initialize logger");
 
     let options = eframe::NativeOptions {
-        always_on_top: true,
         resizable: false,
         initial_window_size: Some(Vec2::new(1280.0, 720.0)),
         ..Default::default()

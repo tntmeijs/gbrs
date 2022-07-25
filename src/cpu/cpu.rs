@@ -28,6 +28,9 @@ use super::opcodes::{
     xor_d, xor_d8, xor_e, xor_h, xor_hl, xor_l,
 };
 
+/// Program execution starts at this address
+const PROGRAM_COUNTER_START_ADDRESS: u16 = 0x0100;
+
 /// Represents all special states the CPU can be in
 pub enum CpuState {
     /// Stop mode
@@ -120,7 +123,7 @@ impl Cpu {
             h: 0,
             l: 0,
             stack_pointer: 0,
-            program_counter: 0x0100,
+            program_counter: PROGRAM_COUNTER_START_ADDRESS,
             cycle: 0,
             ime: false,
             zero: false,
@@ -129,6 +132,11 @@ impl Cpu {
             carry: false,
             state: None,
         }
+    }
+
+    /// Reset the program counter to the entry point address
+    pub fn reset_program_counter(&mut self) {
+        self.program_counter = PROGRAM_COUNTER_START_ADDRESS;
     }
 
     /// Execute the next instruction in memory
@@ -166,9 +174,24 @@ impl Cpu {
         memory.write_byte_at(0xFF0F, flags);
     }
 
-    /// Check if the v-blank interrupt bit flag has been set
+    /// Check if an interrupt bit flag has been set
     pub fn is_interrupt_flag_set(&self, memory: &Memory, flag: InterruptFlag) -> bool {
         let flags = memory.read_byte_at(0xFFFF);
+
+        let bit_position = match flag {
+            InterruptFlag::VBlank(_) => 0,
+            InterruptFlag::LcdStat(_) => 1,
+            InterruptFlag::Timer(_) => 2,
+            InterruptFlag::Serial(_) => 3,
+            InterruptFlag::Joypad(_) => 4,
+        };
+
+        is_nth_bit_set_u8(flags, bit_position)
+    }
+
+    /// Check if a request interrupt bit flag has been set
+    pub fn is_request_interrupt_flag_set(&self, memory: &Memory, flag: InterruptFlag) -> bool {
+        let flags = memory.read_byte_at(0xFF0F);
 
         let bit_position = match flag {
             InterruptFlag::VBlank(_) => 0,
