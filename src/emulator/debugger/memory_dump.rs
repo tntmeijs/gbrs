@@ -10,11 +10,22 @@ const VALUES_PER_ROW: usize = 16;
 const TABLE_HEIGHT: usize = 0x10_000 / VALUES_PER_ROW;
 const FIRST_COLUMN_WIDTH: f32 = 55.0;
 
-pub struct MemoryDump {}
+pub struct MemoryDump {
+    breakpoint_addresses: Vec<u16>,
+}
 
 impl Default for MemoryDump {
     fn default() -> Self {
-        Self {}
+        Self {
+            breakpoint_addresses: vec![],
+        }
+    }
+}
+
+impl MemoryDump {
+    /// Update the internal list of known breakpoint addresses
+    pub fn set_breakpoint_addresses(&mut self, addresses: &Vec<u16>) {
+        self.breakpoint_addresses = addresses.to_vec();
     }
 }
 
@@ -67,14 +78,14 @@ impl DebuggerUiElement for MemoryDump {
                                     &format!("{:#04X}", memory.read_byte_at(address))[2..],
                                 );
 
-                                // Highlight the data pointed to be the program counter and stack
-                                // pointer
                                 if address == cpu.program_counter {
                                     ui.label(
                                         address_text.background_color(Color32::LIGHT_RED).strong(),
                                     );
                                 } else if address == cpu.stack_pointer {
                                     ui.label(address_text.background_color(Color32::GOLD).strong());
+                                } else if self.breakpoint_addresses.contains(&address) {
+                                    ui.label(address_text.color(Color32::RED).strong());
                                 } else {
                                     ui.label(address_text);
                                 }

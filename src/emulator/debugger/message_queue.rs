@@ -6,6 +6,7 @@ pub enum MessageData {
     UpdateRunningState(bool),
     TickOnce,
     ResetGameBoy(bool),
+    BreakpointTriggered,
 }
 
 /// Simple message queue to trigger various actions within the debugger.

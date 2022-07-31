@@ -22,6 +22,7 @@ Tahar
 - Refactored CPU and memory debugging tools.
 - Added placeholder panel for breakpoints.
 - Added stack pointer and program counter highlighting.
+- Added breakpoint support.
 
 ![debugger preview](./media/20220721.png)
 

@@ -68,9 +68,20 @@ impl Debugger {
                     self.debugger_state.is_running = is_running
                 }
                 MessageData::TickOnce => self.debugger_state.should_tick_once = true,
-                MessageData::ResetGameBoy(clear_memory) => gameboy.reset(clear_memory),
+                MessageData::ResetGameBoy(clear_memory) => {
+                    gameboy.reset(clear_memory);
+
+                    if clear_memory {
+                        self.debugger_state.is_game_loaded = false;
+                    }
+                }
+                MessageData::BreakpointTriggered => self.debugger_state.is_running = false,
             };
         }
+
+        // Ensure the memory debugger is able to highlight all known breakpoints
+        self.memory_dump
+            .set_breakpoint_addresses(&self.breakpoints.get_active_breakpoint_addresses());
     }
 
     /// Draw the entire debugger
@@ -87,16 +98,24 @@ impl Debugger {
 
         egui::CentralPanel::default().show(context, |ui| {
             // Breakpoints
-            egui::SidePanel::left("breakpoints").show_inside(ui, |ui| {
-                self.breakpoints
-                    .draw(&mut self.message_queue, ui, gameboy, &self.debugger_state);
-            });
+            egui::SidePanel::left("breakpoints")
+                .resizable(false)
+                .show_inside(ui, |ui| {
+                    self.breakpoints.draw(
+                        &mut self.message_queue,
+                        ui,
+                        gameboy,
+                        &self.debugger_state,
+                    );
+                });
 
             // CPU information
-            egui::SidePanel::right("registers").show_inside(ui, |ui| {
-                self.cpu_info
-                    .draw(&mut self.message_queue, ui, gameboy, &self.debugger_state);
-            });
+            egui::SidePanel::right("registers")
+                .resizable(false)
+                .show_inside(ui, |ui| {
+                    self.cpu_info
+                        .draw(&mut self.message_queue, ui, gameboy, &self.debugger_state);
+                });
 
             // Memory dump
             egui::CentralPanel::default().show_inside(ui, |ui| {
