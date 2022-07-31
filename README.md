@@ -16,3 +16,25 @@ hear your thoughts.
 Cheers,
 
 Tahar
+
+## Changelog
+### 31-07-2022
+- Refactored CPU and memory debugging tools.
+- Added placeholder panel for breakpoints.
+- Added stack pointer and program counter highlighting.
+
+![debugger preview](./media/20220721.png)
+
+### 25-07-2022
+- Restructured project to make it easier to find modules.
+- Started working on basic CPU and memory debugging tools.
+
+### 14-07-2022
+- Added initial implementation of most 8-bit CPU opcodes.
+
+### 13-07-2022
+- Added cartridge loading.
+- Added basic fetch-decode-execute loop.
+
+### 11-07-2022
+- Initial project set-up.
