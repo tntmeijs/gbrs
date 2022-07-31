@@ -1,3 +1,3 @@
-mod debugging;
+mod debugger;
 pub mod emulator;
-mod menu;
+mod gameboy;

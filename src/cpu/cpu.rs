@@ -31,6 +31,9 @@ use super::opcodes::{
 /// Program execution starts at this address
 const PROGRAM_COUNTER_START_ADDRESS: u16 = 0x0100;
 
+/// By default the stack pointer starts here
+const STACK_POINTER_START_ADDRESS: u16 = 0xFFFE;
+
 /// Represents all special states the CPU can be in
 pub enum CpuState {
     /// Stop mode
@@ -122,7 +125,7 @@ impl Cpu {
             e: 0,
             h: 0,
             l: 0,
-            stack_pointer: 0,
+            stack_pointer: STACK_POINTER_START_ADDRESS,
             program_counter: PROGRAM_COUNTER_START_ADDRESS,
             cycle: 0,
             ime: false,
@@ -134,9 +137,24 @@ impl Cpu {
         }
     }
 
-    /// Reset the program counter to the entry point address
-    pub fn reset_program_counter(&mut self) {
+    /// Reset the CPU to its initial state
+    pub fn reset(&mut self) {
+        self.a = 0;
+        self.b = 0;
+        self.c = 0;
+        self.d = 0;
+        self.e = 0;
+        self.h = 0;
+        self.l = 0;
+        self.stack_pointer = STACK_POINTER_START_ADDRESS;
         self.program_counter = PROGRAM_COUNTER_START_ADDRESS;
+        self.cycle = 0;
+        self.ime = false;
+        self.zero = false;
+        self.negative = false;
+        self.half_carry = false;
+        self.carry = false;
+        self.state = None;
     }
 
     /// Execute the next instruction in memory
@@ -579,12 +597,5 @@ impl Cpu {
     /// Read an opcode from the location in memory to which the program counter points
     fn read_opcode(&self, memory: &mut Memory) -> u8 {
         memory.read_byte_at(self.program_counter)
-    }
-}
-
-impl Default for Cpu {
-    /// Create a new Cpu instance with default values
-    fn default() -> Self {
-        Self::new()
     }
 }

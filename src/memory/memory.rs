@@ -7,19 +7,19 @@ use crate::{
 
 /// Represents a GameBoy's addressable memory - this includes ROM, RAM, VRAM, etc.
 pub struct Memory {
-    pub bytes: Vec<u8>,
+    pub bytes: Box<Vec<u8>>,
 }
 
 impl Memory {
     /// Create a new memory object, allocate the maximum size, and set all values to zero
     pub fn new() -> Self {
         Self {
-            bytes: vec![0u8; 0x10_000],
+            bytes: Box::new(vec![0u8; 0x10_000]),
         }
     }
 
     /// Copy a block of bytes into memory starting at the specified address without allocating a
-    /// a new vector (this method iterates over all bytes and copies each value)
+    /// new vector (this method iterates over all bytes and copies each value)
     pub fn copy_into_memory_at_address(&mut self, address: u16, data: &Vec<u8>) -> bool {
         let last_byte_index = usize::from(address) + data.len();
 
@@ -106,11 +106,11 @@ impl Memory {
 
         lsb_msb_to_u16(lsb, msb)
     }
-}
 
-impl Default for Memory {
-    /// Create a new Memory instance with default values
-    fn default() -> Self {
-        Self::new()
+    /// Clear all contents from memory
+    pub fn clear(&mut self) {
+        for byte in self.bytes.iter_mut() {
+            *byte = 0;
+        }
     }
 }
