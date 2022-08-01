@@ -18,8 +18,8 @@ pub fn ld_bc_d16(cpu: &mut Cpu, memory: &Memory) {
     let value = memory.read_16_bit_value_at(cpu.program_counter + 1);
     let (lsb, msb) = u16_to_lsb_msb(value);
 
-    cpu.b = lsb;
-    cpu.c = msb;
+    cpu.b = msb;
+    cpu.c = lsb;
 
     cpu.program_counter += 3;
     cpu.cycle += 3;
@@ -27,7 +27,7 @@ pub fn ld_bc_d16(cpu: &mut Cpu, memory: &Memory) {
 
 /// Store the contents of register A in the memory location specified by register pair BC
 pub fn ld_bc_a(cpu: &mut Cpu, memory: &mut Memory) {
-    memory.write_byte_at(lsb_msb_to_u16(cpu.b, cpu.c), cpu.a);
+    memory.write_byte_at(lsb_msb_to_u16(cpu.c, cpu.b), cpu.a);
 
     cpu.program_counter += 1;
     cpu.cycle += 2;
@@ -35,11 +35,11 @@ pub fn ld_bc_a(cpu: &mut Cpu, memory: &mut Memory) {
 
 /// Increment the contents of register pair BC by 1
 pub fn inc_bc(cpu: &mut Cpu) {
-    let value = lsb_msb_to_u16(cpu.b, cpu.c).wrapping_add(1);
+    let value = lsb_msb_to_u16(cpu.c, cpu.b).wrapping_add(1);
     let (lsb, msb) = u16_to_lsb_msb(value);
 
-    cpu.b = lsb;
-    cpu.c = msb;
+    cpu.b = msb;
+    cpu.c = lsb;
 
     cpu.program_counter += 1;
     cpu.cycle += 2;
@@ -108,15 +108,15 @@ pub fn ld_a16_sp(cpu: &mut Cpu, memory: &mut Memory) {
 /// Add the contents of register pair BC to the contents of register pair HL, and store the results
 /// in register pair HL
 pub fn add_hl_bc(cpu: &mut Cpu) {
-    let bc = lsb_msb_to_u16(cpu.b, cpu.c);
-    let hl = lsb_msb_to_u16(cpu.h, cpu.l);
+    let bc = lsb_msb_to_u16(cpu.c, cpu.b);
+    let hl = lsb_msb_to_u16(cpu.l, cpu.h);
     let result = bc.wrapping_add(hl);
     let (lsb, msb) = u16_to_lsb_msb(result);
 
     cpu.half_carry = is_nth_bit_set_u16(hl, 15);
     cpu.carry = is_nth_bit_set_u16(hl, 15);
-    cpu.h = lsb;
-    cpu.l = msb;
+    cpu.h = msb;
+    cpu.l = lsb;
     cpu.negative = false;
 
     cpu.program_counter += 1;
@@ -125,7 +125,7 @@ pub fn add_hl_bc(cpu: &mut Cpu) {
 
 /// Load the 8-bit contents of memory specified by register pair BC into register A
 pub fn ld_a_bc(cpu: &mut Cpu, memory: &Memory) {
-    let address = lsb_msb_to_u16(cpu.b, cpu.c);
+    let address = lsb_msb_to_u16(cpu.c, cpu.b);
     let value = memory.read_byte_at(address);
 
     cpu.a = value;
@@ -136,11 +136,11 @@ pub fn ld_a_bc(cpu: &mut Cpu, memory: &Memory) {
 
 /// Decrement the contents of register pair BC by 1
 pub fn dec_bc(cpu: &mut Cpu) {
-    let value = lsb_msb_to_u16(cpu.b, cpu.c).wrapping_sub(1);
+    let value = lsb_msb_to_u16(cpu.c, cpu.b).wrapping_sub(1);
     let (lsb, msb) = u16_to_lsb_msb(value);
 
-    cpu.b = lsb;
-    cpu.c = msb;
+    cpu.b = msb;
+    cpu.c = lsb;
 
     cpu.program_counter += 1;
     cpu.cycle += 2;
@@ -221,8 +221,8 @@ pub fn ld_de_d16(cpu: &mut Cpu, memory: &Memory) {
     let value = memory.read_16_bit_value_at(cpu.program_counter + 1);
     let (lsb, msb) = u16_to_lsb_msb(value);
 
-    cpu.d = lsb;
-    cpu.e = msb;
+    cpu.d = msb;
+    cpu.e = lsb;
 
     cpu.program_counter += 3;
     cpu.cycle += 3;
@@ -230,7 +230,7 @@ pub fn ld_de_d16(cpu: &mut Cpu, memory: &Memory) {
 
 /// Store the contents of register A in the memory location specified by register pair DE
 pub fn ld_de_a(cpu: &mut Cpu, memory: &mut Memory) {
-    let address = lsb_msb_to_u16(cpu.d, cpu.e);
+    let address = lsb_msb_to_u16(cpu.e, cpu.d);
     memory.write_byte_at(address, cpu.a);
 
     cpu.program_counter += 1;
@@ -239,11 +239,11 @@ pub fn ld_de_a(cpu: &mut Cpu, memory: &mut Memory) {
 
 /// Increment the contents of register pair DE by 1
 pub fn inc_de(cpu: &mut Cpu) {
-    let value = lsb_msb_to_u16(cpu.d, cpu.e).wrapping_add(1);
+    let value = lsb_msb_to_u16(cpu.e, cpu.d).wrapping_add(1);
     let (lsb, msb) = u16_to_lsb_msb(value);
 
-    cpu.d = lsb;
-    cpu.e = msb;
+    cpu.d = msb;
+    cpu.e = lsb;
     cpu.program_counter += 1;
     cpu.cycle += 2;
 }
@@ -306,15 +306,15 @@ pub fn jr_s8(cpu: &mut Cpu, memory: &Memory) {
 /// Add the contents of register pair DE to the contents of register pair HL, and store the results
 /// in register pair HL
 pub fn add_hl_de(cpu: &mut Cpu) {
-    let de = lsb_msb_to_u16(cpu.d, cpu.e);
-    let hl = lsb_msb_to_u16(cpu.h, cpu.l);
+    let de = lsb_msb_to_u16(cpu.e, cpu.d);
+    let hl = lsb_msb_to_u16(cpu.l, cpu.h);
     let result = de.wrapping_add(hl);
     let (lsb, msb) = u16_to_lsb_msb(result);
 
     cpu.half_carry = is_nth_bit_set_u16(hl, 15);
     cpu.carry = is_nth_bit_set_u16(hl, 15);
-    cpu.h = lsb;
-    cpu.l = msb;
+    cpu.h = msb;
+    cpu.l = lsb;
     cpu.zero = result == 0;
     cpu.negative = false;
     cpu.program_counter += 1;
@@ -323,7 +323,7 @@ pub fn add_hl_de(cpu: &mut Cpu) {
 
 /// Load the 8-bit contents of memory specified by register pair DE into register A
 pub fn ld_a_de(cpu: &mut Cpu, memory: &Memory) {
-    let address = lsb_msb_to_u16(cpu.d, cpu.e);
+    let address = lsb_msb_to_u16(cpu.e, cpu.d);
     cpu.a = memory.read_byte_at(address);
     cpu.program_counter += 1;
     cpu.cycle += 2;
@@ -331,11 +331,11 @@ pub fn ld_a_de(cpu: &mut Cpu, memory: &Memory) {
 
 /// Decrement the contents of register pair DE by 1
 pub fn dec_de(cpu: &mut Cpu) {
-    let value = lsb_msb_to_u16(cpu.d, cpu.e).wrapping_sub(1);
+    let value = lsb_msb_to_u16(cpu.e, cpu.d).wrapping_sub(1);
     let (lsb, msb) = u16_to_lsb_msb(value);
 
-    cpu.d = lsb;
-    cpu.e = msb;
+    cpu.d = msb;
+    cpu.e = lsb;
     cpu.program_counter += 1;
     cpu.cycle += 2;
 }
@@ -403,8 +403,8 @@ pub fn ld_hl_d16(cpu: &mut Cpu, memory: &Memory) {
     let value = memory.read_16_bit_value_at(cpu.program_counter + 1);
     let (lsb, msb) = u16_to_lsb_msb(value);
 
-    cpu.h = lsb;
-    cpu.l = msb;
+    cpu.h = msb;
+    cpu.l = lsb;
     cpu.program_counter += 3;
     cpu.cycle += 3;
 }
@@ -413,24 +413,24 @@ pub fn ld_hl_d16(cpu: &mut Cpu, memory: &Memory) {
 /// simultaneously increment the contents of HL
 pub fn ld_hl_inc_a(cpu: &mut Cpu, memory: &mut Memory) {
     // Store contents of A
-    let address_in_hl = lsb_msb_to_u16(cpu.h, cpu.l);
+    let address_in_hl = lsb_msb_to_u16(cpu.l, cpu.h);
     memory.write_byte_at(address_in_hl, cpu.a);
 
     // Increment contents of HL
     let (lsb, msb) = u16_to_lsb_msb(address_in_hl.wrapping_add(1));
-    cpu.h = lsb;
-    cpu.l = msb;
+    cpu.h = msb;
+    cpu.l = lsb;
     cpu.program_counter += 1;
     cpu.cycle += 2;
 }
 
 /// Increment the contents of register pair HL by 1
 pub fn inc_hl(cpu: &mut Cpu) {
-    let value = lsb_msb_to_u16(cpu.h, cpu.l).wrapping_add(1);
+    let value = lsb_msb_to_u16(cpu.l, cpu.h).wrapping_add(1);
     let (lsb, msb) = u16_to_lsb_msb(value);
 
-    cpu.h = lsb;
-    cpu.l = msb;
+    cpu.h = msb;
+    cpu.l = lsb;
     cpu.program_counter += 1;
     cpu.cycle += 2;
 }
@@ -477,14 +477,14 @@ pub fn jr_z_s8(cpu: &mut Cpu, memory: &Memory) {
 /// Add the contents of register pair HL to the contents of register pair HL, and store the results
 /// in register pair HL
 pub fn add_hl_hl(cpu: &mut Cpu) {
-    let hl = lsb_msb_to_u16(cpu.h, cpu.l);
+    let hl = lsb_msb_to_u16(cpu.l, cpu.h);
     let result = hl.wrapping_add(hl);
     let (lsb, msb) = u16_to_lsb_msb(result);
 
     cpu.half_carry = is_nth_bit_set_u16(hl, 15);
     cpu.carry = is_nth_bit_set_u16(hl, 15);
-    cpu.h = lsb;
-    cpu.l = msb;
+    cpu.h = msb;
+    cpu.l = lsb;
     cpu.zero = result == 0;
     cpu.negative = false;
     cpu.program_counter += 1;
@@ -495,24 +495,24 @@ pub fn add_hl_hl(cpu: &mut Cpu) {
 /// increment the contents of HL
 pub fn ld_a_hl_inc(cpu: &mut Cpu, memory: &mut Memory) {
     // Load contents of memory address
-    let address_in_hl = lsb_msb_to_u16(cpu.h, cpu.l);
+    let address_in_hl = lsb_msb_to_u16(cpu.l, cpu.h);
     cpu.a = memory.read_byte_at(address_in_hl);
 
     // Increment HL
     let (lsb, msb) = u16_to_lsb_msb(address_in_hl.wrapping_add(1));
-    cpu.h = lsb;
-    cpu.l = msb;
+    cpu.h = msb;
+    cpu.l = lsb;
     cpu.program_counter += 1;
     cpu.cycle += 2;
 }
 
 /// Decrement the contents of register pair HL by 1
 pub fn dec_hl(cpu: &mut Cpu) {
-    let value = lsb_msb_to_u16(cpu.h, cpu.l).wrapping_sub(1);
+    let value = lsb_msb_to_u16(cpu.l, cpu.h).wrapping_sub(1);
     let (lsb, msb) = u16_to_lsb_msb(value);
 
-    cpu.h = lsb;
-    cpu.l = msb;
+    cpu.h = msb;
+    cpu.l = lsb;
     cpu.program_counter += 1;
     cpu.cycle += 2;
 }
@@ -572,13 +572,13 @@ pub fn ld_sp_d16(cpu: &mut Cpu, memory: &Memory) {
 /// simultaneously decrement the contents of HL.
 pub fn ld_hl_dec_a(cpu: &mut Cpu, memory: &mut Memory) {
     // Store contents of A
-    let address_in_hl = lsb_msb_to_u16(cpu.h, cpu.l);
+    let address_in_hl = lsb_msb_to_u16(cpu.l, cpu.h);
     memory.write_byte_at(address_in_hl, cpu.a);
 
     // Decrement contents of HL
     let (lsb, msb) = u16_to_lsb_msb(address_in_hl.wrapping_sub(1));
-    cpu.h = lsb;
-    cpu.l = msb;
+    cpu.h = msb;
+    cpu.l = lsb;
     cpu.program_counter += 1;
     cpu.cycle += 2;
 }
@@ -592,7 +592,7 @@ pub fn inc_sp(cpu: &mut Cpu) {
 
 /// Increment the contents of memory specified by register pair HL by 1
 pub fn inc_hl_address(cpu: &mut Cpu, memory: &mut Memory) {
-    let address = lsb_msb_to_u16(cpu.h, cpu.l);
+    let address = lsb_msb_to_u16(cpu.l, cpu.h);
     let value = memory.read_byte_at(address) + 1;
     memory.write_byte_at(address, value);
 
@@ -605,7 +605,7 @@ pub fn inc_hl_address(cpu: &mut Cpu, memory: &mut Memory) {
 
 /// Decrement the contents of memory specified by register pair HL by 1
 pub fn dec_hl_address(cpu: &mut Cpu, memory: &mut Memory) {
-    let address = lsb_msb_to_u16(cpu.h, cpu.l);
+    let address = lsb_msb_to_u16(cpu.l, cpu.h);
     let value = memory.read_byte_at(address) - 1;
     memory.write_byte_at(address, value);
 
@@ -620,7 +620,7 @@ pub fn dec_hl_address(cpu: &mut Cpu, memory: &mut Memory) {
 /// pair HL
 pub fn ld_hl_d8(cpu: &mut Cpu, memory: &mut Memory) {
     let value = memory.read_byte_at(cpu.program_counter + 1);
-    let address = lsb_msb_to_u16(cpu.h, cpu.l);
+    let address = lsb_msb_to_u16(cpu.l, cpu.h);
     memory.write_byte_at(address, value);
 
     cpu.program_counter += 2;
@@ -650,15 +650,15 @@ pub fn jr_c_s8(cpu: &mut Cpu, memory: &Memory) {
 /// Add the contents of register pair SP to the contents of register pair HL, and store the results
 /// in register pair HL.
 pub fn add_hl_sp(cpu: &mut Cpu) {
-    let value = lsb_msb_to_u16(cpu.h, cpu.l);
+    let value = lsb_msb_to_u16(cpu.l, cpu.h);
 
     cpu.negative = false;
     cpu.half_carry = is_nth_bit_set_u16(value, 15);
     cpu.carry = is_nth_bit_set_u16(value, 15);
 
     let (lsb, msb) = u16_to_lsb_msb(value.wrapping_add(cpu.stack_pointer));
-    cpu.h = lsb;
-    cpu.l = msb;
+    cpu.h = msb;
+    cpu.l = lsb;
     cpu.program_counter += 1;
     cpu.cycle += 2;
 }
@@ -667,13 +667,13 @@ pub fn add_hl_sp(cpu: &mut Cpu) {
 /// decrement the contents of HL
 pub fn ld_a_hl_dec(cpu: &mut Cpu, memory: &Memory) {
     // Load data into register A
-    let address = lsb_msb_to_u16(cpu.h, cpu.l);
+    let address = lsb_msb_to_u16(cpu.l, cpu.h);
     cpu.a = memory.read_byte_at(address);
 
     // Decrement value in register pair HL
     let (lsb, msb) = u16_to_lsb_msb(address);
-    cpu.h = lsb;
-    cpu.l = msb;
+    cpu.h = msb;
+    cpu.l = lsb;
     cpu.program_counter += 1;
     cpu.cycle += 2;
 }
@@ -765,7 +765,7 @@ pub fn ld_b_l(cpu: &mut Cpu) {
 
 /// Load the 8-bit contents of memory specified by register pair HL into register B
 pub fn ld_b_hl(cpu: &mut Cpu, memory: &Memory) {
-    let address = lsb_msb_to_u16(cpu.h, cpu.l);
+    let address = lsb_msb_to_u16(cpu.l, cpu.h);
     cpu.b = memory.read_byte_at(address);
     cpu.program_counter += 1;
     cpu.cycle += 2;
@@ -822,7 +822,7 @@ pub fn ld_c_l(cpu: &mut Cpu) {
 
 /// Load the 8-bit contents of memory specified by register pair HL into register C
 pub fn ld_c_hl(cpu: &mut Cpu, memory: &Memory) {
-    let address = lsb_msb_to_u16(cpu.h, cpu.l);
+    let address = lsb_msb_to_u16(cpu.l, cpu.h);
     cpu.c = memory.read_byte_at(address);
     cpu.program_counter += 1;
     cpu.cycle += 2;
@@ -879,7 +879,7 @@ pub fn ld_d_l(cpu: &mut Cpu) {
 
 /// Load the 8-bit contents of memory specified by register pair HL into register D
 pub fn ld_d_hl(cpu: &mut Cpu, memory: &Memory) {
-    let address = lsb_msb_to_u16(cpu.h, cpu.l);
+    let address = lsb_msb_to_u16(cpu.l, cpu.h);
     cpu.d = memory.read_byte_at(address);
     cpu.program_counter += 1;
     cpu.cycle += 2;
@@ -936,7 +936,7 @@ pub fn ld_e_l(cpu: &mut Cpu) {
 
 /// Load the 8-bit contents of memory specified by register pair HL into register E
 pub fn ld_e_hl(cpu: &mut Cpu, memory: &Memory) {
-    let address = lsb_msb_to_u16(cpu.h, cpu.l);
+    let address = lsb_msb_to_u16(cpu.l, cpu.h);
     cpu.e = memory.read_byte_at(address);
     cpu.program_counter += 1;
     cpu.cycle += 2;
@@ -993,7 +993,7 @@ pub fn ld_h_l(cpu: &mut Cpu) {
 
 /// Load the 8-bit contents of memory specified by register pair HL into register H
 pub fn ld_h_hl(cpu: &mut Cpu, memory: &Memory) {
-    let address = lsb_msb_to_u16(cpu.h, cpu.l);
+    let address = lsb_msb_to_u16(cpu.l, cpu.h);
     cpu.h = memory.read_byte_at(address);
     cpu.program_counter += 1;
     cpu.cycle += 2;
@@ -1050,7 +1050,7 @@ pub fn ld_l_l(cpu: &mut Cpu) {
 
 /// Load the 8-bit contents of memory specified by register pair HL into register L
 pub fn ld_l_hl(cpu: &mut Cpu, memory: &Memory) {
-    let address = lsb_msb_to_u16(cpu.h, cpu.l);
+    let address = lsb_msb_to_u16(cpu.l, cpu.h);
     cpu.l = memory.read_byte_at(address);
     cpu.program_counter += 1;
     cpu.cycle += 2;
@@ -1065,7 +1065,7 @@ pub fn ld_l_a(cpu: &mut Cpu) {
 
 /// Store the contents of register B in the memory location specified by register pair HL
 pub fn ld_hl_b(cpu: &mut Cpu, memory: &mut Memory) {
-    let address = lsb_msb_to_u16(cpu.h, cpu.l);
+    let address = lsb_msb_to_u16(cpu.l, cpu.h);
     memory.write_byte_at(address, cpu.b);
 
     cpu.program_counter += 1;
@@ -1074,7 +1074,7 @@ pub fn ld_hl_b(cpu: &mut Cpu, memory: &mut Memory) {
 
 /// Store the contents of register C in the memory location specified by register pair HL
 pub fn ld_hl_c(cpu: &mut Cpu, memory: &mut Memory) {
-    let address = lsb_msb_to_u16(cpu.h, cpu.l);
+    let address = lsb_msb_to_u16(cpu.l, cpu.h);
     memory.write_byte_at(address, cpu.c);
 
     cpu.program_counter += 1;
@@ -1083,7 +1083,7 @@ pub fn ld_hl_c(cpu: &mut Cpu, memory: &mut Memory) {
 
 /// Store the contents of register D in the memory location specified by register pair HL
 pub fn ld_hl_d(cpu: &mut Cpu, memory: &mut Memory) {
-    let address = lsb_msb_to_u16(cpu.h, cpu.l);
+    let address = lsb_msb_to_u16(cpu.l, cpu.h);
     memory.write_byte_at(address, cpu.d);
 
     cpu.program_counter += 1;
@@ -1092,7 +1092,7 @@ pub fn ld_hl_d(cpu: &mut Cpu, memory: &mut Memory) {
 
 /// Store the contents of register E in the memory location specified by register pair HL
 pub fn ld_hl_e(cpu: &mut Cpu, memory: &mut Memory) {
-    let address = lsb_msb_to_u16(cpu.h, cpu.l);
+    let address = lsb_msb_to_u16(cpu.l, cpu.h);
     memory.write_byte_at(address, cpu.e);
 
     cpu.program_counter += 1;
@@ -1101,7 +1101,7 @@ pub fn ld_hl_e(cpu: &mut Cpu, memory: &mut Memory) {
 
 /// Store the contents of register H in the memory location specified by register pair HL
 pub fn ld_hl_h(cpu: &mut Cpu, memory: &mut Memory) {
-    let address = lsb_msb_to_u16(cpu.h, cpu.l);
+    let address = lsb_msb_to_u16(cpu.l, cpu.h);
     memory.write_byte_at(address, cpu.h);
 
     cpu.program_counter += 1;
@@ -1110,7 +1110,7 @@ pub fn ld_hl_h(cpu: &mut Cpu, memory: &mut Memory) {
 
 /// Store the contents of register L in the memory location specified by register pair HL
 pub fn ld_hl_l(cpu: &mut Cpu, memory: &mut Memory) {
-    let address = lsb_msb_to_u16(cpu.h, cpu.l);
+    let address = lsb_msb_to_u16(cpu.l, cpu.h);
     memory.write_byte_at(address, cpu.l);
 
     cpu.program_counter += 1;
@@ -1144,7 +1144,7 @@ pub fn halt(cpu: &mut Cpu) {
 
 /// Store the contents of register A in the memory location specified by register pair HL
 pub fn ld_hl_a(cpu: &mut Cpu, memory: &mut Memory) {
-    let address = lsb_msb_to_u16(cpu.h, cpu.l);
+    let address = lsb_msb_to_u16(cpu.l, cpu.h);
     memory.write_byte_at(address, cpu.a);
 
     cpu.program_counter += 1;
@@ -1195,7 +1195,7 @@ pub fn ld_a_l(cpu: &mut Cpu) {
 
 /// Load the 8-bit contents of memory specified by register pair HL into register A
 pub fn ld_a_hl(cpu: &mut Cpu, memory: &Memory) {
-    let address = lsb_msb_to_u16(cpu.h, cpu.l);
+    let address = lsb_msb_to_u16(cpu.l, cpu.h);
     cpu.a = memory.read_byte_at(address);
     cpu.program_counter += 1;
     cpu.cycle += 2;
@@ -1283,7 +1283,7 @@ pub fn add_a_l(cpu: &mut Cpu) {
 /// Add the contents of memory specified by register pair HL to the contents of register A, and
 /// store the results in register A
 pub fn add_a_hl(cpu: &mut Cpu, memory: &Memory) {
-    let address = lsb_msb_to_u16(cpu.h, cpu.l);
+    let address = lsb_msb_to_u16(cpu.l, cpu.h);
 
     cpu.half_carry = is_nth_bit_set_u8(cpu.a, 7);
     cpu.carry = is_nth_bit_set_u8(cpu.a, 7);
@@ -1381,7 +1381,7 @@ pub fn sub_l(cpu: &mut Cpu) {
 /// Subtract the contents of memory specified by register pair HL from the contents of register A,
 /// and store the results in register A.
 pub fn sub_hl(cpu: &mut Cpu, memory: &Memory) {
-    let address = lsb_msb_to_u16(cpu.h, cpu.l);
+    let address = lsb_msb_to_u16(cpu.l, cpu.h);
     let value = memory.read_byte_at(address);
 
     cpu.half_carry = is_nth_bit_set_u8(cpu.a, 7);
@@ -1480,7 +1480,7 @@ pub fn and_l(cpu: &mut Cpu) {
 /// Take the logical AND for each bit of the contents of memory specified by register pair HL and
 /// the contents of register A, and store the results in register A.
 pub fn and_hl(cpu: &mut Cpu, memory: &Memory) {
-    let address = lsb_msb_to_u16(cpu.h, cpu.l);
+    let address = lsb_msb_to_u16(cpu.l, cpu.h);
     let value = memory.read_byte_at(address);
 
     cpu.a &= value;
@@ -1579,7 +1579,7 @@ pub fn xor_l(cpu: &mut Cpu) {
 /// Take the logical exclusive-OR for each bit of the contents of memory specified by register pair
 /// HL and the contents of register A, and store the results in register A.
 pub fn xor_hl(cpu: &mut Cpu, memory: &Memory) {
-    let address = lsb_msb_to_u16(cpu.h, cpu.l);
+    let address = lsb_msb_to_u16(cpu.l, cpu.h);
     let value = memory.read_byte_at(address);
 
     cpu.a ^= value;
@@ -1678,7 +1678,7 @@ pub fn or_l(cpu: &mut Cpu) {
 /// Take the logical OR for each bit of the contents of memory specified by register pair
 /// HL and the contents of register A, and store the results in register A.
 pub fn or_hl(cpu: &mut Cpu, memory: &Memory) {
-    let address = lsb_msb_to_u16(cpu.h, cpu.l);
+    let address = lsb_msb_to_u16(cpu.l, cpu.h);
     let value = memory.read_byte_at(address);
 
     cpu.a |= value;
@@ -1771,7 +1771,7 @@ pub fn cp_l(cpu: &mut Cpu) {
 /// Compare the contents of memory specified by register pair HL and the contents of register A by
 /// calculating A - (HL), and set the Z flag if they are equal.
 pub fn cp_hl(cpu: &mut Cpu, memory: &Memory) {
-    let address = lsb_msb_to_u16(cpu.h, cpu.l);
+    let address = lsb_msb_to_u16(cpu.l, cpu.h);
     let value = memory.read_byte_at(address);
 
     cpu.zero = cpu.a.wrapping_sub(value) == 0;
@@ -1984,7 +1984,7 @@ pub fn call_nc_a16(cpu: &mut Cpu, memory: &mut Memory) {
 
 /// Push the contents of register pair DE onto the memory stack.
 pub fn push_de(cpu: &mut Cpu, memory: &mut Memory) {
-    let value = lsb_msb_to_u16(cpu.d, cpu.e);
+    let value = lsb_msb_to_u16(cpu.e, cpu.d);
     memory.push_stack_u16(value, cpu);
 
     cpu.program_counter += 1;
@@ -2091,7 +2091,7 @@ pub fn ld_port_c_a(cpu: &mut Cpu, memory: &mut Memory) {
 
 /// Push the contents of register pair HL onto the memory stack.
 pub fn push_hl(cpu: &mut Cpu, memory: &mut Memory) {
-    let value = lsb_msb_to_u16(cpu.h, cpu.l);
+    let value = lsb_msb_to_u16(cpu.l, cpu.h);
     memory.push_stack_u16(value, cpu);
 
     cpu.program_counter += 1;
@@ -2129,7 +2129,7 @@ pub fn add_sp_s8(cpu: &mut Cpu, memory: &Memory) {
 /// Load the contents of register pair HL into the program counter PC. The next instruction is
 /// fetched from the location specified by the new value of PC.
 pub fn jp_hl(cpu: &mut Cpu) {
-    cpu.program_counter = lsb_msb_to_u16(cpu.h, cpu.l);
+    cpu.program_counter = lsb_msb_to_u16(cpu.l, cpu.h);
     cpu.cycle += 1;
 }
 
@@ -2252,15 +2252,15 @@ pub fn ld_hl_sp_plus_s8(cpu: &mut Cpu, memory: &mut Memory) {
     let result = (cpu.stack_pointer as i16 + value) as u16;
     let (lsb, msb) = u16_to_lsb_msb(result);
 
-    cpu.h = lsb;
-    cpu.l = msb;
+    cpu.h = msb;
+    cpu.l = lsb;
     cpu.program_counter += 2;
     cpu.cycle += 3;
 }
 
 /// Load the contents of register pair HL into the stack pointer SP.
 pub fn ld_sp_hl(cpu: &mut Cpu) {
-    cpu.stack_pointer = lsb_msb_to_u16(cpu.h, cpu.l);
+    cpu.stack_pointer = lsb_msb_to_u16(cpu.l, cpu.h);
     cpu.program_counter += 1;
     cpu.cycle += 2;
 }
